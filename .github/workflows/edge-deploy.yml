@@ -33,7 +33,7 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.RPI_SSH_KEY }}" | tr -d '\r' > ~/.ssh/dvc_key
           chmod 600 ~/.ssh/dvc_key
-          dvc remote modify --local local_remote keyfile ~/.ssh/dvc_key
+          dvc remote modify local_remote grant_ext true
           dvc pull
       - name: Disponibiliza o modelo em /app/models
         run: |
@@ -106,7 +106,7 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.RPI_SSH_KEY }}" | tr -d '\r' > ~/.ssh/dvc_key
           chmod 600 ~/.ssh/dvc_key
-          dvc remote modify --local local_remote keyfile ~/.ssh/dvc_key
+          dvc remote modify local_remote grant_ext true
           dvc pull models/yolov8n.pt
       - name: Executar quality gate (mAP@0.5 >= 0.50)
         run: python scripts/validate_model.py --threshold 0.50

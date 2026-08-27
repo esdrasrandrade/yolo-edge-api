@@ -26,18 +26,14 @@ jobs:
       - name: Instalar dependências
         run: |
           pip install -r app/requirements.txt
-          pip install pytest ruff
-      - name: Download modelo para testes
+          pip install pytest ruff ultralytics
+      - name: Garante diretório e modelo para testes
         run: |
-          pip install "dvc[ssh]"
-          mkdir -p ~/.ssh
-          echo "${{ secrets.RPI_SSH_KEY }}" | tr -d '\r' > ~/.ssh/dvc_key
-          chmod 600 ~/.ssh/dvc_key
-          dvc remote modify local_remote grant_ext true
-          dvc pull
-      - name: Disponibiliza o modelo em /app/models
-        run: |
-          sudo mkdir -p /app
+          mkdir -p models /app/models
+          if [ ! -f "models/yolov8n.pt" ]; then
+            python -c "from ultralytics import YOLO; model = YOLO('yolov8n.pt')"
+            cp yolov8n.pt models/yolov8n.pt
+          fi
           sudo ln -sfn "$GITHUB_WORKSPACE/models" /app/models
       - name: Lint (ruff)
         run: ruff check app/
@@ -100,14 +96,13 @@ jobs:
           python-version: "3.11"
           cache: pip
       - name: Instalar dependências
-        run: pip install ultralytics "dvc[ssh]"
-      - name: Recuperar modelo via DVC
+        run: pip install ultralytics
+      - name: Garantir modelo presente
         run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.RPI_SSH_KEY }}" | tr -d '\r' > ~/.ssh/dvc_key
-          chmod 600 ~/.ssh/dvc_key
-          dvc remote modify local_remote grant_ext true
-          dvc pull models/yolov8n.pt
+          if [ ! -f "models/yolov8n.pt" ]; then
+            python -c "from ultralytics import YOLO; model = YOLO('yolov8n.pt')"
+            cp yolov8n.pt models/yolov8n.pt
+          fi
       - name: Executar quality gate (mAP@0.5 >= 0.50)
         run: python scripts/validate_model.py --threshold 0.50
 

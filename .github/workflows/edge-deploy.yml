@@ -7,8 +7,8 @@ on:
     branches: [main]
 
 env:
-  REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}/yolo-api
+  REGISTRY:    ghcr.io
+  IMAGE_NAME:  ${{ github.repository }}/yolo-api
 
 jobs:
   test:
@@ -34,17 +34,14 @@ jobs:
           pip install -r app/requirements.txt
           pip install pytest ruff
 
-      - name: Baixar modelo diretamente para testes
+      - name: Baixar e posicionar modelo para testes
         run: |
           mkdir -p models
           python -c "from ultralytics import YOLO; model = YOLO('yolov8n.pt')"
+          cp yolov8n.pt models/yolov8n.pt
           sudo mkdir -p /app/models
           sudo cp yolov8n.pt /app/models/yolov8n.pt
           sudo chmod 777 /app/models/yolov8n.pt
-      - name: Disponibiliza o modelo em /app/models
-        run: |
-          mkdir -p /tmp/app/models
-          cp models/yolov8n.pt /tmp/app/models/yolov8n.pt
 
       - name: Lint (ruff)
         run: ruff check app/ --fix
@@ -94,7 +91,7 @@ jobs:
           push: ${{ github.ref == 'refs/heads/main' }}
           tags: ${{ steps.meta.outputs.tags }}
           cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-to:   type=gha,mode=max
 
   model-gate:
     name: "Model Quality Gate"
@@ -144,9 +141,9 @@ jobs:
       - name: Deploy via SSH com rollback automático
         uses: appleboy/ssh-action@v1
         with:
-          host: ${{ secrets.RPI_HOST }}
+          host:     ${{ secrets.RPI_HOST }}
           username: ${{ secrets.RPI_USER }}
-          key: ${{ secrets.RPI_SSH_KEY }}
+          key:      ${{ secrets.RPI_SSH_KEY }}
           script: |
             export DEPLOY_PATH=${{ secrets.RPI_DEPLOY_PATH }}
             cd $DEPLOY_PATH

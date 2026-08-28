@@ -1,12 +1,14 @@
 import base64
 import io
 import time
+
 from fastapi import FastAPI, HTTPException
-from PIL import Image
-import numpy as np
 import httpx
-from schemas import PredictRequest, PredictResponse, HealthResponse, MetricsResponse, Detection
-from model import load_model, get_default_model_name
+import numpy as np
+from PIL import Image
+
+from model import get_default_model_name, load_model
+from schemas import Detection, HealthResponse, PredictRequest, PredictResponse
 
 app = FastAPI(title="YOLO Inference API", version="1.0.0")
 _metrics = {"total": 0, "success": 0, "total_ms": 0.0}
@@ -33,7 +35,7 @@ async def health_check():
     try:
         load_model(model_name)
         loaded = True
-    except Exception:
+    except Exception:  # noqa: BLE001
         loaded = False
     return HealthResponse(status="ok", model_loaded=loaded, model_name=model_name)
 
@@ -71,6 +73,5 @@ def predict(request: PredictRequest):
         )
     except HTTPException:
         raise
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001
         raise HTTPException(status_code=500, detail=str(e))
-

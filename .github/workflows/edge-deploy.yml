@@ -46,7 +46,7 @@ jobs:
           cp models/yolov8n.pt /tmp/app/models/yolov8n.pt
 
       - name: Lint (ruff)
-        run: ruff check app/--fix
+        run: ruff check app/ --fix
 
       - name: Testes automatizados
         run: pytest tests/ -v --tb=short

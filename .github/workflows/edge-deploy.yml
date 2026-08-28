@@ -7,8 +7,8 @@ on:
     branches: [main]
 
 env:
-  REGISTRY:    ghcr.io
-  IMAGE_NAME:  ${{ github.repository }}/yolo-api
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}/yolo-api
 
 jobs:
   test:
@@ -23,7 +23,8 @@ jobs:
         with:
           authkey: ${{ secrets.TAILSCALE_AUTHKEY }}
 
-      - name: Setup Python 3.11        uses: actions/setup-python@v5
+      - name: Setup Python 3.11
+        uses: actions/setup-python@v5
         with:
           python-version: "3.11"
           cache: pip
@@ -31,7 +32,7 @@ jobs:
       - name: Instalar dependências
         run: |
           pip install -r app/requirements.txt
-          pip install pytest ruff ultralytics
+          pip install pytest ruff
 
       - name: Baixar modelo diretamente para testes
         run: |
@@ -59,7 +60,8 @@ jobs:
       packages: write
     steps:
       - name: Checkout
-        uses: acti
+        uses: actions/checkout@v4
+
       - name: Configurar QEMU (emulação ARM64)
         uses: docker/setup-qemu-action@v3
 
@@ -91,7 +93,7 @@ jobs:
           push: ${{ github.ref == 'refs/heads/main' }}
           tags: ${{ steps.meta.outputs.tags }}
           cache-from: type=gha
-          cache-to:   type=gha,mode=max
+          cache-to: type=gha,mode=max
 
   model-gate:
     name: "Model Quality Gate"
@@ -113,7 +115,7 @@ jobs:
           cache: pip
 
       - name: Instalar dependências
-        run: pip install ultralytics
+        run: pip install -r app/requirements.txt
 
       - name: Garantir modelo presente
         run: |
@@ -141,9 +143,9 @@ jobs:
       - name: Deploy via SSH com rollback automático
         uses: appleboy/ssh-action@v1
         with:
-          host:     ${{ secrets.RPI_HOST }}
+          host: ${{ secrets.RPI_HOST }}
           username: ${{ secrets.RPI_USER }}
-          key:      ${{ secrets.RPI_SSH_KEY }}
+          key: ${{ secrets.RPI_SSH_KEY }}
           script: |
             export DEPLOY_PATH=${{ secrets.RPI_DEPLOY_PATH }}
             cd $DEPLOY_PATH

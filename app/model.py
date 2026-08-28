@@ -11,7 +11,7 @@ def _patched_torch_load(*args, **kwargs):
 torch.load = _patched_torch_load
 
 MODELS_DIR = Path("/app/models")
-_cache = dict()
+_cache = {}
 
 def load_model(model_name: str) -> YOLO:
     if model_name not in _cache:

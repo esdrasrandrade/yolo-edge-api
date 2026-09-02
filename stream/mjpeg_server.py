@@ -7,7 +7,7 @@ from pathlib import Path
 import sys
 import threading
 import time
-
+from flask import send_file
 import cv2
 from flask import Flask, Response
 
@@ -85,6 +85,10 @@ def health():
         "frame_count": _detector._frame_idx if _detector else 0,
     }
     return Response(json.dumps(status), mimetype='application/json')
+
+@app.route('/download')
+def download_video():
+    return send_file('/tmp/stream_anotado.avi', as_attachment=True)
 
 def parse_args():
     p = argparse.ArgumentParser()

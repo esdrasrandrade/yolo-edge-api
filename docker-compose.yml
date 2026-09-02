@@ -4,18 +4,20 @@ services:
       context: .
       dockerfile: Dockerfile.api
     container_name: yolo-api
+    privileged: true
     ports:
       - "8000:8000"
     volumes:
       - ./models:/app/models:ro
       - ./output:/app/output
       - ./images:/app/images:ro
+      - /dev:/dev
+      - /run/udev:/run/udev:ro
     environment:
-      - MODEL_NAME=yolov8n.pt
+      - MODEL_NAME=yolo-epi.pt
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
       interval: 15s
       timeout: 5s
       retries: 3
-

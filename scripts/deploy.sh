@@ -5,7 +5,7 @@ cd "$DEPLOY_PATH"
 
 echo "[1/4] Baixando nova imagem..."
     docker compose pull
-    python3 -m dvc pull models/yolo-epi.pt
+    python3 -m dvc pull models/yolo-epi.pt || true
 echo "[2/4] Iniciando nova versão..."
     docker compose up -d --build
 echo "[3/4] Aguardando health check..."
